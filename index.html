@@ -1,149 +1,113 @@
 <!DOCTYPE html>
-<html lang='en'>
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Easting & Northings Test</title>
-    
-    <script 
-    src='./what3words.js?key=0E3KN406'>
-    </script>
+
+    <script src="./what3words.js?key=0E3KN406"></script>
     <!--
     <script 
     src='./what3words.js?key=VFD2REF7'>
     </script>
     -->
+  </head>
+  <body>
+    <p id="w3w"><strong>Best What 3 word address is:</strong><br /></p>
+    <p id="nearest_place"><strong>Nearest Place:</strong><br /></p>
+    <p id="country"><strong>Country:</strong><br /></p>
+    <p id="easting"><strong>Easting</strong><br /></p>
+    <p id="northing"><strong>Northing</strong><br /></p>
 
-</head>
-<body>
-
-    <p id='w3w'>Best What 3 word address is:</br></p>
-    <p id='nearest_place'>Nearest Place:</br></p>
-    <p id='autoSuggestions'>Best Auto Suggestion:</br></p>
-    
     <!-- Get User input and show results -->
-    <form>
-        <td><label for = 'w3w1'>First Word</label>
-            <input type = 'text' id='w3wFirst' name='w3wFirst' placeholder='First word' autofocus></input>
-        </td>
-        <td><label for = 'w3w2'>Second Word</label>
-            <input type = 'text' id='w3wSecond' name='w3wSecond' placeholder='Second word' autofocus></input>
-        </td>
-        <td><label for = 'w3w3'>Third Word</label>
-            <input type = 'text' id='w3wThird' name='w3wThird' placeholder='Third word' autofocus></input>
-        </td>
+    <form id="submit-form">
+      <label for="all-words">First Word</label>
+      <input
+        type="text"
+        id="all-words"
+        name="all-words"
+        value="spot.loose.puddles"
+        placeholder="what.three.words"
+        autofocus
+      />
 
-        <td>
-            <p><button onclick='getW3W()'>Get what3words Address</button></td></p>
-        </td>
-        <td>
-            <p><button onclick=localStorage.clear()>Reset</button></td></p>
-        </td>
+      <p>
+        <button>Get what3words Address</button>
+      </p>
 
-        <td>
-            <p><a id='geoViewLink' href ='#' target="_blank">Goto Easting & Northing</a></p>
-        </td>
-
+      <p>
+        <a id="geoViewLink" href="#" target="_blank">Goto Easting & Northing</a>
+      </p>
     </form>
 
     <!-- Store What3Words address -->
-    <script>
+    <script type="module">
+      import OsGridRef, {
+        LatLon,
+      } from "https://cdn.jsdelivr.net/npm/geodesy@2.2.0/osgridref.js";
 
-        function getW3W() {
-            window.localStorage['w3wFirst'] = document.getElementById('w3wFirst').value;
-            window.localStorage['w3wSecond'] = document.getElementById('w3wSecond').value;
-            window.localStorage['w3wThird'] = document.getElementById('w3wThird').value;
-         }
+      // Function to get all 3 words and return them as an array (I removed the 3 inputs for just one)
+      function getW3W(event) {
+        const w3wFirst = document.getElementById("w3wFirst").value;
+        const w3wSecond = document.getElementById("w3wSecond").value;
+        const w3wThird = document.getElementById("w3wThird").value;
+        return [w3wFirst, w3wSecond, w3wThird];
+      }
 
-            var w3wWord =  window.localStorage['w3wFirst'] + '.';
-            w3wWord += window.localStorage['w3wSecond'] + '.';
-            w3wWord += window.localStorage['w3wThird'];
+      // Adds an event listener to the form
+      document
+        .querySelector("#submit-form")
+        .addEventListener("submit", (event) => {
+          // This will prevent the form from submitting and reloading the page
+          event.preventDefault();
 
-            localStorage.setItem['w3wWord'] = w3wWord;
+          // This is how you would use function with 3 inputs
+          //   const words = getW3W().concat(".");
 
-        // console.log(w3wWord);
+          // Get the value from the input and store it in a variable called words
+          const words = document.querySelector("#all-words").value;
 
-    </script>
-
-        <!-- Convert what3words address to Lat / Long 
-             and get suggestions back
-        -->
-        <script>
-  
-            //w3w to Laitude & longtitude
-            what3words.api.convertToCoordinates(w3wWord)
-                .then(function(response) {
-                    clipToCountry: ['GB'],
-                    language = 'GB',
-                localStorage.setItem('OsGridRef.lat',response.coordinates.lat);
-                localStorage.setItem('OsGridRef.lng',response.coordinates.lng);
-                localStorage.setItem('w3wResponse', response);
-            });
-
-            var lat = window.localStorage['OsGridRef.lat'];
-            var lng = window.localStorage['OsGridRef.lng'];
-
-            localStorage.setItem['lat'] = lat;
-            localStorage.setItem['lng'] = lng;
-
-            console.log(lat);
-            console.log(lng);
-
-            // w3w suggestions 
-            what3words.api.autosuggest(w3wWord, {
-                clipToCountry: ['GB'],
-                nResults: 5
-            }).then(function(response) {
-                // Test top 5 auto responses
-              console.log('Auto Suggestions: ', response.suggestions[0]);
-              console.log('Auto Suggestions: ', response.suggestions[1]);
-              console.log('Auto Suggestions: ', response.suggestions[2]);
-              console.log('Auto Suggestions: ', response.suggestions[3]);
-              console.log('Auto Suggestions: ', response.suggestions[4]);
-
-                localStorage.setItem('word', response.suggestions[0].words);
-                localStorage.setItem('nearestPlace', response.suggestions[0].nearestPlace);
-                localStorage.setItem('Auto_Suggestions', response.suggestions[0].words
-                    + ' ,  ' + response.suggestions[0].nearestPlace
-                    + ' ,  ' + response.suggestions[0].country);
-                localStorage.setItem('Auto_Suggestions2', response.suggestions[1].words
-                    + ' ,  ' + response.suggestions[1].nearestPlace
-                    + ' ,  ' + response.suggestions[1].country);
-                localStorage.setItem('Auto_Suggestions3', response.suggestions[2].words
-                    + ' ,  ' + response.suggestions[2].nearestPlace
-                    + ' ,  ' + response.suggestions[2].country);
-            });
+          // This little wrapping code just lets me use async/await which is a nicer way of writing .then()
+          (async () => {
+            // Get my auto suggested response
+            const autoSuggestResponse = await what3words.api.autosuggest(
+              words,
+              {
+                clipToCountry: ["GB"],
+                nResults: 5,
+              }
+            );
 
             // Display returned results for end user
-           var w3w = document.getElementById('w3w');
-            w3w.innerHTML += localStorage.getItem('word');
-    
-            nearest_place = document.getElementById('nearest_place');
-            nearest_place.innerHTML += localStorage.getItem('nearestPlace');
-    
-            autoSuggestions = document.getElementById('autoSuggestions');
-            autoSuggestions.innerHTML += localStorage.getItem('Auto_Suggestions');
-    
-        </script>    
+            document
+              .getElementById("w3w")
+              // Append the result directly onto the end of the element
+              .append(autoSuggestResponse.suggestions[0].words);
 
-    <!-- Convert Easting & Northing in to Lat / Long -->
-    <script type = 'module'>
+            document
+              .getElementById("nearest_place")
+              .append(autoSuggestResponse.suggestions[0].nearestPlace);
 
-        //  import OsGridRef, {LatLon} from './osgridref.js';
-         import OsGridRef, {LatLon} from 'https://cdn.jsdelivr.net/npm/geodesy@2.2.0/osgridref.js';
+            document
+              .getElementById("country")
+              .append(autoSuggestResponse.suggestions[0].country);
 
-        // convert lat/lon to east/north
-         const grid = new LatLon(lat, lng).toOsGrid(LatLon.datums.OSGB36);
+            // Retrieve the cords from the what 3 words api
+            const w3wCoordinates = await what3words.api.convertToCoordinates(
+              words
+            );
 
-        // Store Eastings & Northings
-        localStorage.setItem('easting', grid.easting);
-        localStorage.setItem('northing', grid.northing);
-        
-        //console.log(grid);
-        console.log(localStorage.getItem('easting'));
-        console.log(localStorage.getItem('northing'));
-        
+            // Use the cords convert them to this grid format
+            const grid = new LatLon(
+              w3wCoordinates.coordinates.lat,
+              w3wCoordinates.coordinates.lng
+            ).toOsGrid(LatLon.datums.OSGB36);
+
+            // Append the results of this grid format
+            document.getElementById("easting").append(grid.easting);
+            document.getElementById("northing").append(grid.northing);
+          })();
+        });
     </script>
-
-</body>
+  </body>
 </html>
