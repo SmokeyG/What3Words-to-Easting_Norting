@@ -92,6 +92,12 @@
               .getElementById("country")
               .append(autoSuggestResponse.suggestions[0].country);
 
+              // Test other 4 auto responses
+              console.log(autoSuggestResponse.suggestions[1]);
+              console.log(autoSuggestResponse.suggestions[2]);
+              console.log(autoSuggestResponse.suggestions[3]);
+              console.log(autoSuggestResponse.suggestions[4]);
+
             // Retrieve the cords from the what 3 words api
             const w3wCoordinates = await what3words.api.convertToCoordinates(
               words
